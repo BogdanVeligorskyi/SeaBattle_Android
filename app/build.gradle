@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace 'com.digitalartists.seabattle'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.digitalartists.seabattle"

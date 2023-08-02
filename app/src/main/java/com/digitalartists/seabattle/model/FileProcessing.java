@@ -14,8 +14,6 @@ public class FileProcessing {
 
     // filenames
     public static final String SETTINGS_FILENAME = "settings.txt";
-    //public static final String RESULTS_FILENAME = "results.txt";
-
 
     // load settings from settings.txt file
     public static Settings loadSettings(Context context) throws IOException {
@@ -25,7 +23,7 @@ public class FileProcessing {
 
         // if application is run for the first time - don`t read settings.txt
         if (!file.exists()) {
-            settings = new Settings(10, 10, 15, 0);
+            settings = new Settings(1);
             return settings;
         }
 
@@ -39,11 +37,7 @@ public class FileProcessing {
                 break;
             }
             String[] valuesSettings = s.split(",");
-            settings = new Settings(Integer.parseInt(valuesSettings[0]),
-                    Integer.parseInt(valuesSettings[1]),
-                    Integer.parseInt(valuesSettings[2]),
-                    Byte.parseByte(valuesSettings[3]));
-
+            settings = new Settings(Integer.parseInt(valuesSettings[0]));
         }
         return settings;
     }
@@ -56,11 +50,7 @@ public class FileProcessing {
                     new OutputStreamWriter
                             (context.openFileOutput(SETTINGS_FILENAME,
                                     Context.MODE_PRIVATE));
-            outputStreamWriter.write("" + settings.getCols() + ","
-                    + settings.getRows() + ","
-                    + settings.getMinesNum() + ","
-                    + settings.getIsDarkMode()
-            );
+            outputStreamWriter.write("" + settings.getIsDarkMode());
             outputStreamWriter.close();
         }
         catch (IOException e) {
