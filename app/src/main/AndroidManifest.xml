@@ -39,7 +39,7 @@
         <activity
             android:name=".view.PlayActivity"
             android:screenOrientation="portrait"
-            android:label="Sea Battle - Game"
+            android:label="Sea Battle - Ship Placement"
             android:exported="true">
 
             <meta-data

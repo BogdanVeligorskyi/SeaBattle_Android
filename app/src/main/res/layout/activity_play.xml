@@ -93,7 +93,8 @@
     <LinearLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical">
 
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -119,6 +120,12 @@
 
         </HorizontalScrollView>
 
+        <Button
+            android:id="@+id/continueButton_id"
+            android:layout_width="140dp"
+            android:layout_height="60dp"
+            android:text="Continue"/>
     </LinearLayout>
+
 
 </LinearLayout>
