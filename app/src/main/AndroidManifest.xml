@@ -47,6 +47,17 @@
                 android:value="" />
         </activity>
 
+        <activity
+            android:name=".view.GameActivity"
+            android:screenOrientation="portrait"
+            android:label="Sea Battle - Game"
+            android:exported="true">
+
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
     </application>
 
 </manifest>

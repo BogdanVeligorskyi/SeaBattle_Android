@@ -1,6 +1,7 @@
 package com.digitalartists.seabattle.view;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
@@ -87,6 +88,12 @@ public class PlayActivity extends AppCompatActivity {
             buttonThreePartShips.setBackgroundColor(getResources().getColor(R.color.purple_500));
             butMines.setBackgroundColor(getResources().getColor(R.color.orange));
             selectedTypeOfObject = 0;
+        });
+
+        findViewById(R.id.continueButton_id).setOnClickListener(butContinue -> {
+            Intent intent = new Intent(this, GameActivity.class);
+            //intent.putExtra(SETTINGS, finalSettings2);
+            startActivity(intent);
         });
 
         visited_arr = new int[10 * 10];
