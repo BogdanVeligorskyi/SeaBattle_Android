@@ -17,6 +17,46 @@
         android:text="Dark mode">
     </Switch>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="25dp"
+        android:text="Available devices:"
+        android:textSize="18sp"
+        android:layout_gravity="start"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:orientation="horizontal"
+        android:weightSum="4.0">
+
+        <ListView
+            android:id="@+id/pairedDevices_id"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2.0"/>
+
+        <ListView
+            android:id="@+id/availableDevices_id"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2.0"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/isPairedState_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="25dp"
+        android:text="State: connected to ..."
+        android:textSize="18sp"
+        android:layout_gravity="center"/>
+
+
     <Button
         android:id="@+id/saveSettings_id"
         android:layout_height="wrap_content"
