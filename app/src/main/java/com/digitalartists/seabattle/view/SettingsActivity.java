@@ -3,13 +3,12 @@ package com.digitalartists.seabattle.view;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
+import android.util.Log;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.digitalartists.seabattle.R;
@@ -22,7 +21,12 @@ public class SettingsActivity extends AppCompatActivity {
 
     // settings object
     private Settings settings;
-    private boolean isPaired;
+    private RadioButton hostButtonRadioGroup;
+    private RadioButton guestButtonRadioGroup;
+    private EditText hostIPEditText;
+    private EditText guestIPEditText;
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
+    private Switch isDarkModeOn;
 
 
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
@@ -34,8 +38,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         startInit(savedInstanceState);
 
-        intitTextField();
-
+        initSettings();
 
         handlerRadioButtons();
         handlerSaveButton();
@@ -60,11 +63,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void handlerSaveButton() {
 
-        @SuppressLint("UseSwitchCompatOrMaterialCode")
-        Switch isDarkModeOn = findViewById(R.id.switch_id);
-        if (settings.getIsDarkMode() == 1) {
-            isDarkModeOn.setChecked(true);
-        }
+        isDarkModeOn = findViewById(R.id.switch_id);
+
         // handler for 'Save' button
         findViewById(R.id.saveSettings_id).setOnClickListener(butPlay -> {
             if (isDarkModeOn.isChecked()) {
@@ -72,6 +72,9 @@ public class SettingsActivity extends AppCompatActivity {
             } else {
                 settings.setIsDarkMode(0);
             }
+
+            settings.setHostIPAddress(String.valueOf(hostIPEditText.getText()));
+            settings.setGuestIPAddress(String.valueOf(guestIPEditText.getText()));
 
             // save settings to file if data are correct
             try {
@@ -92,7 +95,6 @@ public class SettingsActivity extends AppCompatActivity {
         } else {
             try {
                 settings = FileProcessing.loadSettings(context);
-                isPaired = false;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -101,33 +103,46 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-    private void intitTextField() {
-        TextView textViewIsPaired = findViewById(R.id.isPairedState_id);
-        if (isPaired) {
-            textViewIsPaired.setTextColor(Color.GREEN);
-            textViewIsPaired.setText("State: paired");
-        } else {
-            textViewIsPaired.setTextColor(Color.RED);
-            textViewIsPaired.setText("State: not paired");
-        }
-    }
-
-
     private void handlerRadioButtons() {
         // 'Theme' radio group
         RadioGroup roleRadioGroup = findViewById(R.id.role_id);
-        RadioButton hostButtonRadioGroup = findViewById(R.id.hostButton_id);
-        RadioButton guestButtonRadioGroup = findViewById(R.id.guestButton_id);
         roleRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             // on theme change
             switch (checkedId) {
                 case R.id.hostButton_id:
+                    settings.setRole("HOST");
                     break;
                 case R.id.guestButton_id:
+                    settings.setRole("GUEST");
                     break;
             }
         });
     }
 
+
+    private void initSettings() {
+
+        hostButtonRadioGroup = findViewById(R.id.hostButton_id);
+        guestButtonRadioGroup = findViewById(R.id.guestButton_id);
+        isDarkModeOn = findViewById(R.id.switch_id);
+        if (settings.getIsDarkMode() == 1) {
+            isDarkModeOn.setChecked(true);
+        }
+
+        Log.d("ROLE", ""+settings.getRole());
+
+        if (settings.getRole().contains("HOST")) {
+            hostButtonRadioGroup.setChecked(true);
+        } else {
+            guestButtonRadioGroup.setChecked(true);
+        }
+
+        hostIPEditText = findViewById(R.id.hostIP_id);
+        guestIPEditText = findViewById(R.id.guestIP_id);
+
+        hostIPEditText.setText(settings.getHostIPAddress());
+        guestIPEditText.setText(settings.getGuestIPAddress());
+
+    }
 
 }

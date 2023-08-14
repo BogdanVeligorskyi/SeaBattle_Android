@@ -1,6 +1,7 @@
 package com.digitalartists.seabattle.view;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -15,6 +16,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.digitalartists.seabattle.R;
+import com.digitalartists.seabattle.model.FileProcessing;
+import com.digitalartists.seabattle.model.GameServer;
+import com.digitalartists.seabattle.model.Settings;
+
+import java.io.IOException;
 
 // Play Activity class
 public class PlayActivity extends AppCompatActivity {
@@ -28,6 +34,7 @@ public class PlayActivity extends AppCompatActivity {
     private int threePartShipsNum;
     private int minesNum;
 
+    private Settings settings;
     private int clicksInARow;
 
     @SuppressLint({"DefaultLocale", "ResourceType"})
@@ -36,6 +43,18 @@ public class PlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_play);
+
+        Context context = getApplicationContext();
+        if (savedInstanceState != null) {
+            settings = savedInstanceState.getParcelable(MainActivity.SETTINGS);
+        } else {
+            try {
+                settings = FileProcessing.loadSettings(context);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
 
         onePartShipsNum = 4;
         twoPartShipsNum = 3;
@@ -54,6 +73,10 @@ public class PlayActivity extends AppCompatActivity {
         ImageButton buttonTwoPartShips = findViewById(R.id.twoPartShips_id);
         ImageButton buttonThreePartShips = findViewById(R.id.threePartShips_id);
         ImageButton buttonMines = findViewById(R.id.mines_id);
+
+        if (settings.getRole().contains("HOST")) {
+            new Thread(new GameServer(getApplicationContext())).start();
+        }
 
         Button buttonContinue = findViewById(R.id.continueButton_id);
         buttonContinue.setEnabled(false);

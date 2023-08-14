@@ -7,13 +7,22 @@ import android.os.Parcelable;
 public class Settings implements Parcelable {
 
     private int isDarkMode; // is dark mode enabled
+    private String hostIPAddress;
+    private String guestIPAddress;
+    private String role;
 
-    public Settings(int isDarkMode) {
+    public Settings(int isDarkMode, String hostIPAddress, String guestIPAddress, String role) {
         this.isDarkMode = isDarkMode;
+        this.hostIPAddress = hostIPAddress;
+        this.guestIPAddress = guestIPAddress;
+        this.role = role;
     }
 
     protected Settings(Parcel in) {
         isDarkMode = in.readInt();
+        hostIPAddress = in.readString();
+        guestIPAddress = in.readString();
+        role = in.readString();
     }
 
     public static final Creator<Settings> CREATOR = new Creator<Settings>() {
@@ -32,6 +41,18 @@ public class Settings implements Parcelable {
         return isDarkMode;
     }
 
+    public String getHostIPAddress() {
+        return hostIPAddress;
+    }
+
+    public String getGuestIPAddress() {
+        return guestIPAddress;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -44,6 +65,18 @@ public class Settings implements Parcelable {
 
     public void setIsDarkMode(int isDarkMode) {
         this.isDarkMode = isDarkMode;
+    }
+
+    public void setHostIPAddress(String hostIPAddress) {
+        this.hostIPAddress = hostIPAddress;
+    }
+
+    public void setGuestIPAddress(String guestIPAddress) {
+        this.guestIPAddress = guestIPAddress;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
 }

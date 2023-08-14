@@ -23,7 +23,7 @@ public class FileProcessing {
 
         // if application is run for the first time - don`t read settings.txt
         if (!file.exists()) {
-            settings = new Settings(1);
+            settings = new Settings(1, "192.168.0.101", "192.168.0.102", "HOST");
             return settings;
         }
 
@@ -32,12 +32,12 @@ public class FileProcessing {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         String s;
         while ((s = reader.readLine()) != null) {
-            Log.d("s.length", ""+s.length());
+            //Log.d("s.length", ""+s.length());
             if (s.length() == 0) {
                 break;
             }
             String[] valuesSettings = s.split(",");
-            settings = new Settings(Integer.parseInt(valuesSettings[0]));
+            settings = new Settings(Integer.parseInt(valuesSettings[0]), valuesSettings[1], valuesSettings[2], valuesSettings[3]);
         }
         return settings;
     }
@@ -50,7 +50,10 @@ public class FileProcessing {
                     new OutputStreamWriter
                             (context.openFileOutput(SETTINGS_FILENAME,
                                     Context.MODE_PRIVATE));
-            outputStreamWriter.write("" + settings.getIsDarkMode());
+            outputStreamWriter.write("" + settings.getIsDarkMode()
+                    + "," + settings.getHostIPAddress()
+                    + "," + settings.getGuestIPAddress()
+                    + "," + settings.getRole());
             outputStreamWriter.close();
         }
         catch (IOException e) {
