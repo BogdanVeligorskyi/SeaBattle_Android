@@ -2,6 +2,9 @@ package com.digitalartists.seabattle.model;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.digitalartists.seabattle.view.GameActivity;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,6 +34,9 @@ public class GameServer implements Runnable {
                         new InputStreamReader(socket.getInputStream()));
 
                 String str = in.readLine();
+                if (str.startsWith(GameClient.CHECK_CONNECTION)) {
+                    GameClient.IS_SUCCESS = true;
+                }
 
                 Log.d("response", str);
 

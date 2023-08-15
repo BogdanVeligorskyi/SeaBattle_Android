@@ -37,6 +37,8 @@ public class PlayActivity extends AppCompatActivity {
     private Settings settings;
     private int clicksInARow;
 
+    public static final String VISITED_ARR = "VISITED_ARR";
+
     @SuppressLint({"DefaultLocale", "ResourceType"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +75,6 @@ public class PlayActivity extends AppCompatActivity {
         ImageButton buttonTwoPartShips = findViewById(R.id.twoPartShips_id);
         ImageButton buttonThreePartShips = findViewById(R.id.threePartShips_id);
         ImageButton buttonMines = findViewById(R.id.mines_id);
-
-        if (settings.getRole().contains("HOST")) {
-            new Thread(new GameServer(getApplicationContext())).start();
-        }
 
         Button buttonContinue = findViewById(R.id.continueButton_id);
         buttonContinue.setEnabled(false);
@@ -115,7 +113,7 @@ public class PlayActivity extends AppCompatActivity {
 
         findViewById(R.id.continueButton_id).setOnClickListener(butContinue -> {
             Intent intent = new Intent(this, GameActivity.class);
-            //intent.putExtra(SETTINGS, finalSettings2);
+            intent.putExtra(VISITED_ARR, visited_arr);
             startActivity(intent);
         });
 
