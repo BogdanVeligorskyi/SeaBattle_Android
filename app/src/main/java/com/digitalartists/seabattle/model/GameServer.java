@@ -30,13 +30,18 @@ public class GameServer implements Runnable {
             Log.d("SERVER", "Started listening for clients...");
             while (true) {
                 Socket socket = serverSocket.accept();
+                Log.d("SERVER", "connected");
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
-
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                 String str = in.readLine();
                 if (str.startsWith(GameClient.CHECK_CONNECTION)) {
+                    Log.d("SERVER", "client successfully connected!");
+                    out.println("Server answered with a Maria");
                     GameClient.IS_SUCCESS = true;
                 }
+
+                //if (str.startsWith(GameClient.))
 
                 Log.d("response", str);
 

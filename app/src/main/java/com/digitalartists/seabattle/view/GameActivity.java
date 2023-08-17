@@ -29,6 +29,8 @@ public class GameActivity extends AppCompatActivity {
     private int[] visited_opponent_arr = null;
     private Settings settings;
     private boolean isYourMove;
+    private TextView textViewMove;
+
 
     private int numOfYourRuinsLeft;
     private int numOfOpponentRuinsLeft;
@@ -74,6 +76,7 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void startInit(Bundle savedInstanceState, Context context) {
+        textViewMove = findViewById(R.id.move_id);
         visited_your_arr = getIntent().getIntArrayExtra(PlayActivity.VISITED_ARR);
 
         numOfYourRuinsLeft = 16;
@@ -147,10 +150,10 @@ public class GameActivity extends AppCompatActivity {
                 imageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
                 // handler for CLICK on this image (button)
-                imageButton.setOnClickListener(v -> {
+                /*imageButton.setOnClickListener(v -> {
                     ImageView iView = (ImageView) v;
                     Toast.makeText(this, "Clicked button in 1st board", Toast.LENGTH_LONG).show();
-                });
+                });*/
 
                 tableRow.addView(imageButton);
             }
@@ -205,10 +208,14 @@ public class GameActivity extends AppCompatActivity {
                 imageButton.setImageResource(R.drawable.non_clicked_cell);
                 imageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-                imageButton.setEnabled(false);
+                //imageButton.setEnabled(false);
 
                 // handler for CLICK on this image (button)
                 imageButton.setOnClickListener(v -> {
+                    if (!isYourMove) {
+                        Toast.makeText(getApplicationContext(), "It`s not your move!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     ImageView iView = (ImageView) v;
                     Toast.makeText(this, "Clicked button in 2nd board", Toast.LENGTH_LONG).show();
                 });
@@ -233,12 +240,30 @@ public class GameActivity extends AppCompatActivity {
     private void runAsServer() {
         ProgressBar progressBar = findViewById(R.id.progressBar);
         while (!GameClient.IS_SUCCESS) {
+            progressBar.setVisibility(View.VISIBLE);
         }
         progressBar.setVisibility(View.INVISIBLE);
+        isYourMove = false;
+        setTextViewMove();
+
     }
 
     private void runAsClient() {
+
         new Thread(new GameClient(getApplicationContext(), 1)).start();
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.INVISIBLE);
+        isYourMove = true;
+        setTextViewMove();
+    }
+
+
+    private void setTextViewMove() {
+        if (isYourMove) {
+            textViewMove.setText("Your move");
+        } else {
+            textViewMove.setText("Opponent move");
+        }
     }
 
 }

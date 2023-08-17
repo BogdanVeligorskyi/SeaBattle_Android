@@ -22,12 +22,14 @@ public class GameClient implements Runnable {
     private PrintWriter out;
     private BufferedReader in;
     private Context context;
+
     private final int action;
     public static boolean IS_SUCCESS = false;
 
     public GameClient(Context context, int action) {
         this.context = context;
         this.action = action;
+        //this.clientSocket = clientSocket;
         IS_SUCCESS = false;
     }
 
@@ -35,11 +37,11 @@ public class GameClient implements Runnable {
     private void startConnection() throws IOException {
         Settings settings = FileProcessing.loadSettings(context);
         String ip = settings.getHostIPAddress();
-        int port = 50028;
-        if (ip != null) {
+        int port = 12003;
+        if (ip == null) {
             ip = "192.168.0.101";
         }
-        //Log.d("SERVER_IP", ip);
+        Log.d("SERVER_IP", ip);
         //Log.d("PORT", ""+port);
         while (clientSocket == null) {
             clientSocket = new Socket(ip, port);
@@ -47,6 +49,7 @@ public class GameClient implements Runnable {
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader
                 (clientSocket.getInputStream()));
+        //IS_SUCCESS = true;
     }
 
     // send message to server and retrieve answer
@@ -69,6 +72,7 @@ public class GameClient implements Runnable {
                 startConnection();
                 String res = sendMessage("CHECK_CONNECTION");
                 Log.d("CLIENT:", ""+res);
+                stopConnection();
             } catch (IOException e) {
                 e.printStackTrace();
             }
