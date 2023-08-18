@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -21,16 +22,21 @@ import com.digitalartists.seabattle.model.GameServer;
 import com.digitalartists.seabattle.model.Settings;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 // Game Activity class
 public class GameActivity extends AppCompatActivity {
 
-    private int[] visited_your_arr = null;   // cols*rows array of each button id
+    private static int[] visited_your_arr = null;   // cols*rows array of each button id
     private int[] visited_opponent_arr = null;
     private Settings settings;
     private boolean isYourMove;
     private TextView textViewMove;
 
+    private GameServer gs;
+
+    private static List<ImageView> imageViewList = new ArrayList<ImageView>();
 
     private int numOfYourRuinsLeft;
     private int numOfOpponentRuinsLeft;
@@ -146,6 +152,7 @@ public class GameActivity extends AppCompatActivity {
                 imageButton.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT));
                 imageButton.setId((i-1) * 10 + (j-1));
+                imageButton.setTag(String.valueOf((i-1) * 10 + (j-1)));
                 setIconToButton(imageButton, visited_your_arr[(i-1) * 10 + (j-1)]);
                 imageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
@@ -156,6 +163,7 @@ public class GameActivity extends AppCompatActivity {
                 });*/
 
                 tableRow.addView(imageButton);
+                imageViewList.add(imageButton);
             }
             tableLayout.addView(tableRow, new TableRow.LayoutParams(
                     TableRow.LayoutParams.WRAP_CONTENT,
@@ -208,16 +216,33 @@ public class GameActivity extends AppCompatActivity {
                 imageButton.setImageResource(R.drawable.non_clicked_cell);
                 imageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-                //imageButton.setEnabled(false);
-
                 // handler for CLICK on this image (button)
                 imageButton.setOnClickListener(v -> {
+
+                    // if attempted to click cell while it`s not user`s move
                     if (!isYourMove) {
                         Toast.makeText(getApplicationContext(), "It`s not your move!", Toast.LENGTH_SHORT).show();
                         return;
                     }
+
                     ImageView iView = (ImageView) v;
-                    Toast.makeText(this, "Clicked button in 2nd board", Toast.LENGTH_LONG).show();
+                    int id = iView.getId();
+                    id -= 100;
+
+                    // send value to server
+                    if (!settings.getRole().startsWith("HOST")) {
+                        GameClient gc = new GameClient(getApplicationContext(), 2, String.valueOf(id));
+                        new Thread(gc).start();
+                        Log.d("Answer is ", ""+gc.getAnswer());
+                        String answer = " ";
+                        while (answer.startsWith(" ")) {
+                            answer = gc.getAnswer();
+                        }
+                        setResultForClient(iView, Integer.parseInt(answer));
+
+                    }
+
+                    //Toast.makeText(this, "Clicked button in 2nd board", Toast.LENGTH_LONG).show();
                 });
 
                 tableRow.addView(imageButton);
@@ -230,7 +255,6 @@ public class GameActivity extends AppCompatActivity {
 
     private void runGame() {
         if (settings.getRole().startsWith("HOST")) {
-            new Thread(new GameServer(getApplicationContext())).start();
             runAsServer();
         } else {
             runAsClient();
@@ -238,19 +262,26 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void runAsServer() {
+        Log.d("HERE", "sssss");
+        gs = new GameServer(getApplicationContext());
+        new Thread(gs).start();
         ProgressBar progressBar = findViewById(R.id.progressBar);
-        while (!GameClient.IS_SUCCESS) {
+        if (gs == null) {
+            Log.d("HERE", "null");
+        }
+        Log.d("ANSWER", gs.getAnswer());
+        while (!(gs.getAnswer()).startsWith("CONNECTED")) {
             progressBar.setVisibility(View.VISIBLE);
         }
         progressBar.setVisibility(View.INVISIBLE);
         isYourMove = false;
+        Log.d("HERE", "sssss");
         setTextViewMove();
 
     }
 
     private void runAsClient() {
-
-        new Thread(new GameClient(getApplicationContext(), 1)).start();
+        new Thread(new GameClient(getApplicationContext(), 1, "")).start();
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
         isYourMove = true;
@@ -263,6 +294,51 @@ public class GameActivity extends AppCompatActivity {
             textViewMove.setText("Your move");
         } else {
             textViewMove.setText("Opponent move");
+        }
+    }
+
+    //public static
+
+    public static int checkCellForServer(int cellNum) {
+        return visited_your_arr[cellNum];
+    }
+
+    private void setResultForClient(ImageView imageView, int result) {
+        if (imageView == null) {
+            Log.d("setIconToButton", "Button was not found!");
+            return;
+        }
+
+        if (result == 1) {
+            imageView.setImageResource(R.drawable.digit_1_ruin);
+        } else if (result == 2) {
+            imageView.setImageResource(R.drawable.digit_2_ruin);
+        } else if (result == 3) {
+            imageView.setImageResource(R.drawable.digit_3_ruin);
+        } else if (result == 5 || result == 0) {
+            imageView.setImageResource(R.drawable.non_clicked_cell_ruin);
+        } else if (result == 10) {
+            imageView.setImageResource(R.drawable.mine_clicked);
+        }
+    }
+
+    public static void setResultForServer(int cellNum, int result) {
+        ImageView imageView = imageViewList.get(cellNum);
+        if (imageView == null) {
+            Log.d("setIconToButton", "Button was not found!");
+            return;
+        }
+
+        if (result == 1) {
+            imageView.setImageResource(R.drawable.digit_1_ruin);
+        } else if (result == 2) {
+            imageView.setImageResource(R.drawable.digit_2_ruin);
+        } else if (result == 3) {
+            imageView.setImageResource(R.drawable.digit_3_ruin);
+        } else if (result == 5 || result == 0) {
+            imageView.setImageResource(R.drawable.non_clicked_cell_ruin);
+        } else if (result == 10) {
+            imageView.setImageResource(R.drawable.mine_clicked);
         }
     }
 

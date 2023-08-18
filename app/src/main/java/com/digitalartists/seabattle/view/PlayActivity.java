@@ -58,10 +58,10 @@ public class PlayActivity extends AppCompatActivity {
 
         }
 
-        onePartShipsNum = 4;
-        twoPartShipsNum = 3;
-        threePartShipsNum = 2;
-        minesNum = 4;
+        onePartShipsNum = 1;
+        twoPartShipsNum = 1;
+        threePartShipsNum = 1;
+        minesNum = 1;
 
         clicksInARow = 0;
         selectedTypeOfObject = -1;

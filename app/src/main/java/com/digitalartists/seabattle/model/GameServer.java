@@ -2,9 +2,7 @@ package com.digitalartists.seabattle.model;
 
 import android.content.Context;
 import android.util.Log;
-
 import com.digitalartists.seabattle.view.GameActivity;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,8 +17,11 @@ public class GameServer implements Runnable {
     private BufferedReader in;
     private Context context;
 
+    private volatile String answer;
+
     public GameServer(Context context) {
         this.context = context;
+        this.answer = "";
     }
 
     @Override
@@ -37,11 +38,17 @@ public class GameServer implements Runnable {
                 String str = in.readLine();
                 if (str.startsWith(GameClient.CHECK_CONNECTION)) {
                     Log.d("SERVER", "client successfully connected!");
-                    out.println("Server answered with a Maria");
-                    GameClient.IS_SUCCESS = true;
+                    out.println("CONNECTED");
+                    answer = "CONNECTED";
                 }
 
-                //if (str.startsWith(GameClient.))
+                if (str.startsWith(GameClient.CLIENT_MOVE)) {
+                    Log.d("SERVER", "received cell from client");
+                    String[] strNum = str.split(":");
+                    answer = String.valueOf(GameActivity.checkCellForServer(Integer.parseInt(strNum[1])));
+                    GameActivity.setResultForServer(Integer.parseInt(strNum[1]), Integer.parseInt(answer));
+                    out.println("SERVER_ANSWERED:" + answer);
+                }
 
                 Log.d("response", str);
 
@@ -51,5 +58,9 @@ public class GameServer implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getAnswer() {
+        return answer;
     };
 }
