@@ -4,11 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -24,6 +25,8 @@ import com.digitalartists.seabattle.model.Settings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 // Game Activity class
 public class GameActivity extends AppCompatActivity {
@@ -31,9 +34,10 @@ public class GameActivity extends AppCompatActivity {
     private static int[] visited_your_arr = null;   // cols*rows array of each button id
     private int[] visited_opponent_arr = null;
     private Settings settings;
-    private boolean isYourMove;
+    private static boolean isYourMove;
     private TextView textViewMove;
 
+    ProgressBar progressBar;
     private GameServer gs;
 
     private static List<ImageView> imageViewList = new ArrayList<ImageView>();
@@ -55,6 +59,8 @@ public class GameActivity extends AppCompatActivity {
         createButtonsForBoards();
 
         runGame();
+
+
 
     }
 
@@ -156,12 +162,6 @@ public class GameActivity extends AppCompatActivity {
                 setIconToButton(imageButton, visited_your_arr[(i-1) * 10 + (j-1)]);
                 imageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-                // handler for CLICK on this image (button)
-                /*imageButton.setOnClickListener(v -> {
-                    ImageView iView = (ImageView) v;
-                    Toast.makeText(this, "Clicked button in 1st board", Toast.LENGTH_LONG).show();
-                });*/
-
                 tableRow.addView(imageButton);
                 imageViewList.add(imageButton);
             }
@@ -239,6 +239,13 @@ public class GameActivity extends AppCompatActivity {
                             answer = gc.getAnswer();
                         }
                         setResultForClient(iView, Integer.parseInt(answer));
+                        isYourMove = checkIfRuined(Integer.parseInt(answer));
+                        setTextViewMove();
+                        if (!isYourMove) {
+                            gc = new GameClient(getApplicationContext(), 4, "");
+                            new Thread (gc).start();
+                        }
+                    } else {
 
                     }
 
@@ -263,17 +270,18 @@ public class GameActivity extends AppCompatActivity {
 
     private void runAsServer() {
         Log.d("HERE", "sssss");
-        gs = new GameServer(getApplicationContext());
+        gs = new GameServer(getApplicationContext(), handler);
         new Thread(gs).start();
-        ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar = findViewById(R.id.progressBar);
         if (gs == null) {
             Log.d("HERE", "null");
         }
         Log.d("ANSWER", gs.getAnswer());
-        while (!(gs.getAnswer()).startsWith("CONNECTED")) {
+        progressBar.setVisibility(View.VISIBLE);
+        /*while (!(gs.getAnswer()).startsWith("CONNECTED")) {
             progressBar.setVisibility(View.VISIBLE);
-        }
-        progressBar.setVisibility(View.INVISIBLE);
+        }*/
+        //progressBar.setVisibility(View.INVISIBLE);
         isYourMove = false;
         Log.d("HERE", "sssss");
         setTextViewMove();
@@ -297,11 +305,23 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    //public static
+    public static void setMoveForServer() {
+        isYourMove = true;
+    }
 
     public static int checkCellForServer(int cellNum) {
         return visited_your_arr[cellNum];
     }
+
+
+    private boolean checkIfRuined(int result) {
+        if (result == 1 || result == 2 || result == 3) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     private void setResultForClient(ImageView imageView, int result) {
         if (imageView == null) {
@@ -341,6 +361,22 @@ public class GameActivity extends AppCompatActivity {
             imageView.setImageResource(R.drawable.mine_clicked);
         }
     }
+
+    final Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 1){
+                progressBar.setVisibility(View.INVISIBLE);
+            } else if (msg.what == 2) {
+                setResultForServer(msg.arg1, msg.arg2);
+            } else if (msg.what == 4) {
+                setMoveForServer();
+                setTextViewMove();
+            }
+
+            super.handleMessage(msg);
+        }
+    };
 
 }
 

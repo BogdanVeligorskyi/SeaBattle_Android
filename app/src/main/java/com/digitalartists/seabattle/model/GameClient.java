@@ -12,8 +12,8 @@ import java.net.Socket;
 public class GameClient implements Runnable {
 
     public static final int ACTION_CHECK_CONNECTION = 1;
-    public static final int ACTION_CLIENT_MOVE = 2;
-    public static final int ACTION_SERVER_MOVE = 3;
+    public static final int ACTION_CLIENT_MOVE_1 = 2;
+    public static final int ACTION_CLIENT_MOVE_2 = 3;
     public static final int ACTION_SET_OPPONENT_MOVE = 4;
 
     public static final String CHECK_CONNECTION = "CHECK_CONNECTION:";
@@ -82,7 +82,7 @@ public class GameClient implements Runnable {
                 e.printStackTrace();
             }
         }
-        if (action == ACTION_CLIENT_MOVE) {
+        if (action == ACTION_CLIENT_MOVE_1 || action == ACTION_CLIENT_MOVE_2) {
             try {
                 startConnection();
                 String res = sendMessage(GameClient.CLIENT_MOVE + message);
@@ -97,15 +97,22 @@ public class GameClient implements Runnable {
             }
         }
         if (action == ACTION_SET_OPPONENT_MOVE) {
-            /*try {
+            try {
                 startConnection();
-                String res = sendMessage("CHECK_CONNECTION");
+                String res = sendMessage(GameClient.SET_OPPONENT_MOVE);
                 Log.d("CLIENT:", ""+res);
                 stopConnection();
             } catch (IOException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
+        /*if (action == 5) {
+            try {
+                startConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }*/
     }
 
     public String getAnswer() {
