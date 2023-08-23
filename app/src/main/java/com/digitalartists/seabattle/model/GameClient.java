@@ -1,8 +1,9 @@
 package com.digitalartists.seabattle.model;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,12 +15,15 @@ public class GameClient implements Runnable {
     public static final int ACTION_CHECK_CONNECTION = 1;
     public static final int ACTION_CLIENT_MOVE_1 = 2;
     public static final int ACTION_CLIENT_MOVE_2 = 3;
-    public static final int ACTION_SET_OPPONENT_MOVE = 4;
+    public static final int ACTION_SET_SERVER_MOVE = 4;
+    public static final int ACTION_SERVER_MOVE = 5;
+    public static final int ACTION_SEND_RESPONSE_TO_SERVER = 6;
 
     public static final String CHECK_CONNECTION = "CHECK_CONNECTION:";
     public static final String CLIENT_MOVE = "CLIENT_MOVE:";
+    public static final String SET_SERVER_MOVE = "SET_SERVER_MOVE:";
     public static final String SERVER_MOVE = "SERVER_MOVE:";
-    public static final String SET_OPPONENT_MOVE = "SET_OPPONENT_MOVE:";
+    public static final String SEND_RESPONSE_TO_SERVER = "SEND_RESPONSE_TO_SERVER:";
 
     private Socket clientSocket;
     private PrintWriter out;
@@ -28,15 +32,16 @@ public class GameClient implements Runnable {
     private String message;
 
     private volatile String answer;
+    private Handler handler;
 
     private final int action;
-    //public static boolean IS_SUCCESS = false;
 
-    public GameClient(Context context, int action, String message) {
+    public GameClient(Context context, int action, String message, Handler handler) {
         this.context = context;
         this.action = action;
         this.message = message;
         this.answer = " ";
+        this.handler = handler;
     }
 
     // try to connect to server
@@ -76,7 +81,7 @@ public class GameClient implements Runnable {
             try {
                 startConnection();
                 String res = sendMessage("CHECK_CONNECTION:");
-                Log.d("CLIENT:", ""+res);
+                Log.d("CLIENT:", "CHECK_CONNECTION");
                 stopConnection();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -87,32 +92,64 @@ public class GameClient implements Runnable {
                 startConnection();
                 String res = sendMessage(GameClient.CLIENT_MOVE + message);
                 if (res != null) {
+                    Log.d("CLIENT", "ACTION_CLIENT_MOVE");
                     String[] resArr = res.split(":");
                     answer = resArr[1];
-                    Log.d("ANSWER FROM SERVER", "" + answer);
                     stopConnection();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        if (action == ACTION_SET_OPPONENT_MOVE) {
+        if (action == ACTION_SET_SERVER_MOVE) {
             try {
                 startConnection();
-                String res = sendMessage(GameClient.SET_OPPONENT_MOVE);
-                Log.d("CLIENT:", ""+res);
+                String res = sendMessage(GameClient.SET_SERVER_MOVE);
+                Log.d("CLIENT", "SET_SERVER_MOVE");
                 stopConnection();
+                if (res != null) {
+                    answer = res;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        /*if (action == 5) {
+        if (action == ACTION_SERVER_MOVE) {
             try {
+
                 startConnection();
+                String res = sendMessage(GameClient.SERVER_MOVE);
+
+                if (res != null) {
+                    Log.d("CLIENT", "SERVER_MOVE");
+                    Log.d("CLIENT", "res="+res);
+                    Message msg = handler.obtainMessage();
+                    msg.what = GameClient.ACTION_SERVER_MOVE;
+                    msg.arg1 = Integer.parseInt(res);
+                    handler.sendMessage(msg);
+                }
+
+                stopConnection();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
+
+        if (action == ACTION_SEND_RESPONSE_TO_SERVER) {
+            try {
+
+                startConnection();
+                Log.d("CLIENT", "SEND_RESPONSE_TO_SERVER");
+                String res = sendMessage(GameClient.SEND_RESPONSE_TO_SERVER + message);
+                stopConnection();
+                answer = "stop";
+                Log.d("CLIENT", res);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public String getAnswer() {

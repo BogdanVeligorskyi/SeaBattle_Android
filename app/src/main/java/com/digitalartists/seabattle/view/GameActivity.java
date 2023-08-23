@@ -21,12 +21,9 @@ import com.digitalartists.seabattle.model.FileProcessing;
 import com.digitalartists.seabattle.model.GameClient;
 import com.digitalartists.seabattle.model.GameServer;
 import com.digitalartists.seabattle.model.Settings;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 // Game Activity class
 public class GameActivity extends AppCompatActivity {
@@ -37,8 +34,9 @@ public class GameActivity extends AppCompatActivity {
     private static boolean isYourMove;
     private TextView textViewMove;
 
-    ProgressBar progressBar;
+    private ProgressBar progressBar;
     private GameServer gs;
+    private ImageView imageView;
 
     private static List<ImageView> imageViewList = new ArrayList<ImageView>();
 
@@ -59,8 +57,6 @@ public class GameActivity extends AppCompatActivity {
         createButtonsForBoards();
 
         runGame();
-
-
 
     }
 
@@ -231,22 +227,31 @@ public class GameActivity extends AppCompatActivity {
 
                     // send value to server
                     if (!settings.getRole().startsWith("HOST")) {
-                        GameClient gc = new GameClient(getApplicationContext(), 2, String.valueOf(id));
+                        GameClient gc = new GameClient(getApplicationContext(), 2, String.valueOf(id), null);
                         new Thread(gc).start();
                         Log.d("Answer is ", ""+gc.getAnswer());
                         String answer = " ";
                         while (answer.startsWith(" ")) {
                             answer = gc.getAnswer();
                         }
+                        imageView = iView;
                         setResultForClient(iView, Integer.parseInt(answer));
                         isYourMove = checkIfRuined(Integer.parseInt(answer));
                         setTextViewMove();
                         if (!isYourMove) {
-                            gc = new GameClient(getApplicationContext(), 4, "");
+                            gc = new GameClient(getApplicationContext(), 4, "", null);
+                            new Thread (gc).start();
+                            answer = " ";
+                            while (answer.startsWith(" ")) {
+                                answer = gc.getAnswer();
+                            }
+                            gc = new GameClient(getApplicationContext(), 5, "", handler);
                             new Thread (gc).start();
                         }
                     } else {
-
+                        imageView = iView;
+                        GameServer.move = GameClient.SERVER_MOVE + id;
+                        Log.d("ACTIVITY", GameServer.move);
                     }
 
                     //Toast.makeText(this, "Clicked button in 2nd board", Toast.LENGTH_LONG).show();
@@ -278,10 +283,6 @@ public class GameActivity extends AppCompatActivity {
         }
         Log.d("ANSWER", gs.getAnswer());
         progressBar.setVisibility(View.VISIBLE);
-        /*while (!(gs.getAnswer()).startsWith("CONNECTED")) {
-            progressBar.setVisibility(View.VISIBLE);
-        }*/
-        //progressBar.setVisibility(View.INVISIBLE);
         isYourMove = false;
         Log.d("HERE", "sssss");
         setTextViewMove();
@@ -289,7 +290,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void runAsClient() {
-        new Thread(new GameClient(getApplicationContext(), 1, "")).start();
+        new Thread(new GameClient(getApplicationContext(), 1, "", null)).start();
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
         isYourMove = true;
@@ -313,13 +314,13 @@ public class GameActivity extends AppCompatActivity {
         return visited_your_arr[cellNum];
     }
 
+    private int checkCellForClient(int cellNum) {
+        return visited_your_arr[cellNum];
+    }
+
 
     private boolean checkIfRuined(int result) {
-        if (result == 1 || result == 2 || result == 3) {
-            return true;
-        } else {
-            return false;
-        }
+        return result == 1 || result == 2 || result == 3;
     }
 
 
@@ -365,13 +366,30 @@ public class GameActivity extends AppCompatActivity {
     final Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == 1){
+            if (msg.what == GameClient.ACTION_CHECK_CONNECTION){
                 progressBar.setVisibility(View.INVISIBLE);
-            } else if (msg.what == 2) {
+            } else if (msg.what == GameClient.ACTION_CLIENT_MOVE_1) {
                 setResultForServer(msg.arg1, msg.arg2);
-            } else if (msg.what == 4) {
+            } else if (msg.what == GameClient.ACTION_SET_SERVER_MOVE) {
                 setMoveForServer();
                 setTextViewMove();
+            } else if (msg.what == GameClient.ACTION_SERVER_MOVE) {
+                int num = checkCellForClient(msg.arg1);
+                Toast.makeText(getApplicationContext(), "jjjjjjjj", Toast.LENGTH_SHORT).show();
+                setResultForServer(msg.arg1, num);
+                GameClient gameClient = new GameClient(getApplicationContext(), 6, ""+ msg.arg1 + ":" + num, null);
+                new Thread(gameClient).start();
+                String answer = " ";
+                while (answer.startsWith(" ")) {
+                    Log.d("CLIENT", "inwhile");
+                    answer = gameClient.getAnswer();
+                }
+                if (checkIfRuined(num)) {
+                    gameClient = new GameClient(getApplicationContext(), 5, "", handler);
+                    new Thread(gameClient).start();
+                }
+            } else if (msg.what == GameClient.ACTION_SEND_RESPONSE_TO_SERVER) {
+                setResultForClient(imageView, msg.arg2);
             }
 
             super.handleMessage(msg);
