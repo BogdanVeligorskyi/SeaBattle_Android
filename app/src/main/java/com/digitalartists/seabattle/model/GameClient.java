@@ -18,21 +18,23 @@ public class GameClient implements Runnable {
     public static final int ACTION_SET_SERVER_MOVE = 4;
     public static final int ACTION_SERVER_MOVE = 5;
     public static final int ACTION_SEND_RESPONSE_TO_SERVER = 6;
+    public static final int ACTION_SET_CLIENT_MOVE = 7;
 
     public static final String CHECK_CONNECTION = "CHECK_CONNECTION:";
     public static final String CLIENT_MOVE = "CLIENT_MOVE:";
     public static final String SET_SERVER_MOVE = "SET_SERVER_MOVE:";
     public static final String SERVER_MOVE = "SERVER_MOVE:";
     public static final String SEND_RESPONSE_TO_SERVER = "SEND_RESPONSE_TO_SERVER:";
+    public static final String SET_CLIENT_MOVE = "SET_CLIENT_MOVE:";
 
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
     private Context context;
-    private String message;
+    private final String message;
 
     private volatile String answer;
-    private Handler handler;
+    private final Handler handler;
 
     private final int action;
 
@@ -142,6 +144,22 @@ public class GameClient implements Runnable {
                 startConnection();
                 Log.d("CLIENT", "SEND_RESPONSE_TO_SERVER");
                 String res = sendMessage(GameClient.SEND_RESPONSE_TO_SERVER + message);
+                stopConnection();
+                answer = "stop";
+                Log.d("CLIENT", res);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (action == ACTION_SET_CLIENT_MOVE) {
+            try {
+
+                startConnection();
+
+                Log.d("CLIENT", "SEND_RESPONSE_TO_SERVER");
+                String res = sendMessage(GameClient.SET_CLIENT_MOVE);
                 stopConnection();
                 answer = "stop";
                 Log.d("CLIENT", res);

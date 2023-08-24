@@ -1,6 +1,7 @@
 package com.digitalartists.seabattle.view;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -36,9 +37,12 @@ public class GameActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
     private GameServer gs;
+    private Thread threadGs;
     private ImageView imageView;
+    private TextView textViewYourBoard;
+    private TextView textViewOpponentBoard;
 
-    private static List<ImageView> imageViewList = new ArrayList<ImageView>();
+    private static final List<ImageView> imageViewList = new ArrayList<>();
 
     private int numOfYourRuinsLeft;
     private int numOfOpponentRuinsLeft;
@@ -59,6 +63,7 @@ public class GameActivity extends AppCompatActivity {
         runGame();
 
     }
+
 
     // set icon to button in order to show additional information needed for user
     private void setIconToButton(ImageView imageView, int type) {
@@ -82,13 +87,16 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-
+    // start initialization
     private void startInit(Bundle savedInstanceState, Context context) {
         textViewMove = findViewById(R.id.move_id);
+        textViewOpponentBoard = findViewById(R.id.opponentBoard_id);
+        textViewYourBoard = findViewById(R.id.yourBoard_id);
+
         visited_your_arr = getIntent().getIntArrayExtra(PlayActivity.VISITED_ARR);
 
-        numOfYourRuinsLeft = 16;
-        numOfOpponentRuinsLeft = 16;
+        numOfYourRuinsLeft = 6;
+        numOfOpponentRuinsLeft = 6;
 
         if (savedInstanceState != null) {
             settings = savedInstanceState.getParcelable(MainActivity.SETTINGS);
@@ -103,6 +111,19 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("DefaultLocale")
+    private void setTextViewYourBoard() {
+        textViewYourBoard.setText(String.format("Your board (Ruins left: %d)", numOfYourRuinsLeft));
+    }
+
+
+    @SuppressLint("DefaultLocale")
+    private void setTextViewOpponentBoard() {
+        textViewOpponentBoard.setText(String.format("Opponent board (Ruins left: %d)", numOfOpponentRuinsLeft));
+    }
+
+
+    // initialize graphical boards
     private void createButtonsForBoards() {
         TableLayout tableLayout;
         ImageView imageButton;
@@ -225,6 +246,12 @@ public class GameActivity extends AppCompatActivity {
                     int id = iView.getId();
                     id -= 100;
 
+                    // if you clicked already visited cell
+                    if (visited_opponent_arr[id] != 0) {
+                        Toast.makeText(getApplicationContext(), "You`ve already clicked this cell!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     // send value to server
                     if (!settings.getRole().startsWith("HOST")) {
                         GameClient gc = new GameClient(getApplicationContext(), 2, String.valueOf(id), null);
@@ -254,7 +281,6 @@ public class GameActivity extends AppCompatActivity {
                         Log.d("ACTIVITY", GameServer.move);
                     }
 
-                    //Toast.makeText(this, "Clicked button in 2nd board", Toast.LENGTH_LONG).show();
                 });
 
                 tableRow.addView(imageButton);
@@ -265,6 +291,8 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+
+    // start server or client
     private void runGame() {
         if (settings.getRole().startsWith("HOST")) {
             runAsServer();
@@ -273,15 +301,15 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+
+    // start server
     private void runAsServer() {
         Log.d("HERE", "sssss");
         gs = new GameServer(getApplicationContext(), handler);
-        new Thread(gs).start();
+        threadGs = new Thread(gs);
+        threadGs.start();
         progressBar = findViewById(R.id.progressBar);
-        if (gs == null) {
-            Log.d("HERE", "null");
-        }
-        Log.d("ANSWER", gs.getAnswer());
+        //Log.d("ANSWER", gs.getAnswer());
         progressBar.setVisibility(View.VISIBLE);
         isYourMove = false;
         Log.d("HERE", "sssss");
@@ -289,6 +317,8 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+
+    // start client
     private void runAsClient() {
         new Thread(new GameClient(getApplicationContext(), 1, "", null)).start();
         ProgressBar progressBar = findViewById(R.id.progressBar);
@@ -298,6 +328,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
+    // set (or change) text referenced to your or opponent move
     private void setTextViewMove() {
         if (isYourMove) {
             textViewMove.setText("Your move");
@@ -305,6 +336,7 @@ public class GameActivity extends AppCompatActivity {
             textViewMove.setText("Opponent move");
         }
     }
+
 
     public static void setMoveForServer() {
         isYourMove = true;
@@ -324,6 +356,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
+    // set result for opponent board after user move
     private void setResultForClient(ImageView imageView, int result) {
         if (imageView == null) {
             Log.d("setIconToButton", "Button was not found!");
@@ -332,18 +365,43 @@ public class GameActivity extends AppCompatActivity {
 
         if (result == 1) {
             imageView.setImageResource(R.drawable.digit_1_ruin);
+            numOfOpponentRuinsLeft--;
         } else if (result == 2) {
             imageView.setImageResource(R.drawable.digit_2_ruin);
+            numOfOpponentRuinsLeft--;
         } else if (result == 3) {
             imageView.setImageResource(R.drawable.digit_3_ruin);
+            numOfOpponentRuinsLeft--;
         } else if (result == 5 || result == 0) {
             imageView.setImageResource(R.drawable.non_clicked_cell_ruin);
         } else if (result == 10) {
             imageView.setImageResource(R.drawable.mine_clicked);
         }
+        int id = imageView.getId();
+        visited_opponent_arr[id - 100] = 1;
+
+        setTextViewOpponentBoard();
+
+        // show dialog for winner
+        if (numOfOpponentRuinsLeft == 0) {
+            if (gs != null) {
+                threadGs.interrupt();
+            }
+            AlertDialog.Builder dialog =
+                    new AlertDialog.Builder(this);
+            dialog.setCancelable(false);
+            dialog.setIcon(R.mipmap.ic_launcher_round);
+            dialog.setTitle("Game over");
+            dialog.setMessage("Congratulations, you`ve won the game!");
+            dialog.setPositiveButton("Ok", ((dialogInterface, m) -> finish()));
+            dialog.create();
+            dialog.show();
+        }
+
     }
 
-    public static void setResultForServer(int cellNum, int result) {
+    // set result for user board after opponent move
+    public void setResultForServer(int cellNum, int result) {
         ImageView imageView = imageViewList.get(cellNum);
         if (imageView == null) {
             Log.d("setIconToButton", "Button was not found!");
@@ -352,17 +410,41 @@ public class GameActivity extends AppCompatActivity {
 
         if (result == 1) {
             imageView.setImageResource(R.drawable.digit_1_ruin);
+            numOfYourRuinsLeft--;
         } else if (result == 2) {
             imageView.setImageResource(R.drawable.digit_2_ruin);
+            numOfYourRuinsLeft--;
         } else if (result == 3) {
             imageView.setImageResource(R.drawable.digit_3_ruin);
+            numOfYourRuinsLeft--;
         } else if (result == 5 || result == 0) {
             imageView.setImageResource(R.drawable.non_clicked_cell_ruin);
         } else if (result == 10) {
             imageView.setImageResource(R.drawable.mine_clicked);
         }
+
+        setTextViewYourBoard();
+
+        // show dialog for loser
+        if (numOfYourRuinsLeft == 0) {
+            if (gs != null) {
+                threadGs.interrupt();
+            }
+            AlertDialog.Builder dialog =
+                    new AlertDialog.Builder(this);
+            dialog.setCancelable(false);
+            dialog.setIcon(R.mipmap.ic_launcher_round);
+            dialog.setTitle("Game over");
+            dialog.setMessage("Unfortunately, you`ve lost the game!");
+            dialog.setPositiveButton("Ok", ((dialogInterface, m) -> finish()));
+            dialog.create();
+            dialog.show();
+        }
+
     }
 
+
+    // handler for CLIENT-ACTIVITY and SERVER-ACTIVITY interaction
     final Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -387,9 +469,18 @@ public class GameActivity extends AppCompatActivity {
                 if (checkIfRuined(num)) {
                     gameClient = new GameClient(getApplicationContext(), 5, "", handler);
                     new Thread(gameClient).start();
+                } else {
+                    isYourMove = true;
+                    setTextViewMove();
+                    gameClient = new GameClient(getApplicationContext(), 7, "", null);
+                    new Thread(gameClient).start();
                 }
+
             } else if (msg.what == GameClient.ACTION_SEND_RESPONSE_TO_SERVER) {
                 setResultForClient(imageView, msg.arg2);
+            } else if (msg.what == GameClient.ACTION_SET_CLIENT_MOVE) {
+                isYourMove = false;
+                setTextViewMove();
             }
 
             super.handleMessage(msg);

@@ -21,8 +21,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     // settings object
     private Settings settings;
-    private RadioButton hostButtonRadioGroup;
-    private RadioButton guestButtonRadioGroup;
     private EditText hostIPEditText;
     private EditText guestIPEditText;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
@@ -103,6 +101,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("NonConstantResourceId")
     private void handlerRadioButtons() {
         // 'Theme' radio group
         RadioGroup roleRadioGroup = findViewById(R.id.role_id);
@@ -122,8 +121,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void initSettings() {
 
-        hostButtonRadioGroup = findViewById(R.id.hostButton_id);
-        guestButtonRadioGroup = findViewById(R.id.guestButton_id);
+        RadioButton hostButtonRadioGroup = findViewById(R.id.hostButton_id);
+        RadioButton guestButtonRadioGroup = findViewById(R.id.guestButton_id);
         isDarkModeOn = findViewById(R.id.switch_id);
         if (settings.getIsDarkMode() == 1) {
             isDarkModeOn.setChecked(true);

@@ -17,7 +17,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.digitalartists.seabattle.R;
 import com.digitalartists.seabattle.model.FileProcessing;
-import com.digitalartists.seabattle.model.GameServer;
 import com.digitalartists.seabattle.model.Settings;
 
 import java.io.IOException;
@@ -34,7 +33,6 @@ public class PlayActivity extends AppCompatActivity {
     private int threePartShipsNum;
     private int minesNum;
 
-    private Settings settings;
     private int clicksInARow;
 
     public static final String VISITED_ARR = "VISITED_ARR";
@@ -47,16 +45,7 @@ public class PlayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_play);
 
         Context context = getApplicationContext();
-        if (savedInstanceState != null) {
-            settings = savedInstanceState.getParcelable(MainActivity.SETTINGS);
-        } else {
-            try {
-                settings = FileProcessing.loadSettings(context);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
+        Settings settings;
 
         onePartShipsNum = 1;
         twoPartShipsNum = 1;

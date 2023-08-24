@@ -14,11 +14,8 @@ import java.net.Socket;
 
 public class GameServer implements Runnable {
 
-    private ServerSocket serverSocket;
-    private PrintWriter out;
-    private BufferedReader in;
     private Context context;
-    private Handler handler;
+    private final Handler handler;
 
     public static String move;
     private volatile String answer;
@@ -33,7 +30,7 @@ public class GameServer implements Runnable {
     @Override
     public void run() {
         try {
-            serverSocket = new ServerSocket(12003);
+            ServerSocket serverSocket = new ServerSocket(12003);
             Log.d("SERVER", "Started listening for clients...");
             while (true) {
                 Socket socket = serverSocket.accept();
@@ -114,6 +111,17 @@ public class GameServer implements Runnable {
                     handler.sendMessage(msg);
                     Log.d("SERVER", ""+ strNum[2]);
                     out.println("SENT");
+                    in.close();
+                    socket.close();
+
+                }
+
+                if (str.startsWith(GameClient.SET_CLIENT_MOVE)) {
+                    Log.d("SERVER", "SET_CLIENT_MOVE");
+                    Message msg = handler.obtainMessage();
+                    msg.what = GameClient.ACTION_SET_CLIENT_MOVE;
+                    handler.sendMessage(msg);
+                    out.println("SENT TO CLIENT");
                     in.close();
                     socket.close();
 
