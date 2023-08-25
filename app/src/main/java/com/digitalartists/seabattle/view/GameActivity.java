@@ -95,8 +95,8 @@ public class GameActivity extends AppCompatActivity {
 
         visited_your_arr = getIntent().getIntArrayExtra(PlayActivity.VISITED_ARR);
 
-        numOfYourRuinsLeft = 6;
-        numOfOpponentRuinsLeft = 6;
+        numOfYourRuinsLeft = 16;
+        numOfOpponentRuinsLeft = 16;
 
         if (savedInstanceState != null) {
             settings = savedInstanceState.getParcelable(MainActivity.SETTINGS);
@@ -142,8 +142,9 @@ public class GameActivity extends AppCompatActivity {
                 tableRow.setGravity(Gravity.CENTER);
                 for (int k = 0; k < 11; k++) {
                     TextView textView = new TextView(this);
-                    textView.setLayoutParams((new TableRow.LayoutParams(30,
-                            30)));
+                    textView.setLayoutParams((new TableRow.LayoutParams(60,
+                            60)));
+                    textView.setPadding(5, 5, 5, 5);
                     if (k == 0) {
                         textView.setText(" ");
                     } else {
@@ -168,6 +169,7 @@ public class GameActivity extends AppCompatActivity {
                     textView.setLayoutParams((new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
                             TableRow.LayoutParams.WRAP_CONTENT)));
                     textView.setText(letters[i-1]);
+                    textView.setPadding(5, 5, 5, 5);
                     tableRow.addView(textView);
                     continue;
                 }
@@ -196,8 +198,9 @@ public class GameActivity extends AppCompatActivity {
                 tableRow.setGravity(Gravity.CENTER);
                 for (int k = 0; k < 11; k++) {
                     TextView textView = new TextView(this);
-                    textView.setLayoutParams((new TableRow.LayoutParams(30,
-                            30)));
+                    textView.setLayoutParams((new TableRow.LayoutParams(60,
+                            60)));
+                    textView.setPadding(5, 5, 5, 5);
                     if (k == 0) {
                         textView.setText(" ");
                     } else {
@@ -262,7 +265,7 @@ public class GameActivity extends AppCompatActivity {
                             answer = gc.getAnswer();
                         }
                         imageView = iView;
-                        setResultForClient(iView, Integer.parseInt(answer));
+                        setResultForOpponent(iView, Integer.parseInt(answer));
                         isYourMove = checkIfRuined(Integer.parseInt(answer));
                         setTextViewMove();
                         if (!isYourMove) {
@@ -304,15 +307,14 @@ public class GameActivity extends AppCompatActivity {
 
     // start server
     private void runAsServer() {
-        Log.d("HERE", "sssss");
-        gs = new GameServer(getApplicationContext(), handler);
+        gs = new GameServer(handler);
         threadGs = new Thread(gs);
         threadGs.start();
         progressBar = findViewById(R.id.progressBar);
-        //Log.d("ANSWER", gs.getAnswer());
         progressBar.setVisibility(View.VISIBLE);
         isYourMove = false;
-        Log.d("HERE", "sssss");
+        setTextViewYourBoard();
+        setTextViewOpponentBoard();
         setTextViewMove();
 
     }
@@ -320,20 +322,25 @@ public class GameActivity extends AppCompatActivity {
 
     // start client
     private void runAsClient() {
-        new Thread(new GameClient(getApplicationContext(), 1, "", null)).start();
-        ProgressBar progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.INVISIBLE);
+        new Thread(new GameClient(getApplicationContext(), 1, "", handler)).start();
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
         isYourMove = true;
+        setTextViewYourBoard();
+        setTextViewOpponentBoard();
         setTextViewMove();
     }
 
 
     // set (or change) text referenced to your or opponent move
+    @SuppressLint("SetTextI18n")
     private void setTextViewMove() {
         if (isYourMove) {
             textViewMove.setText("Your move");
+            textViewMove.setTextColor(getResources().getColor(R.color.green));
         } else {
             textViewMove.setText("Opponent move");
+            textViewMove.setTextColor(getResources().getColor(R.color.red));
         }
     }
 
@@ -357,7 +364,7 @@ public class GameActivity extends AppCompatActivity {
 
 
     // set result for opponent board after user move
-    private void setResultForClient(ImageView imageView, int result) {
+    private void setResultForOpponent(ImageView imageView, int result) {
         if (imageView == null) {
             Log.d("setIconToButton", "Button was not found!");
             return;
@@ -401,7 +408,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     // set result for user board after opponent move
-    public void setResultForServer(int cellNum, int result) {
+    public void setResultForYour(int cellNum, int result) {
         ImageView imageView = imageViewList.get(cellNum);
         if (imageView == null) {
             Log.d("setIconToButton", "Button was not found!");
@@ -448,22 +455,24 @@ public class GameActivity extends AppCompatActivity {
     final Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == GameClient.ACTION_CHECK_CONNECTION){
+            if (msg.what == GameClient.ACTION_CHECK_CONNECTION && settings.getRole().startsWith("HOST")) {
                 progressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(getApplicationContext(), "Connection with GUEST has been established", Toast.LENGTH_LONG).show();
+            } else if (msg.what == GameClient.ACTION_CHECK_CONNECTION && settings.getRole().startsWith("GUEST")) {
+                progressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(getApplicationContext(), "Connection with HOST has been established!", Toast.LENGTH_LONG).show();
             } else if (msg.what == GameClient.ACTION_CLIENT_MOVE_1) {
-                setResultForServer(msg.arg1, msg.arg2);
+                setResultForYour(msg.arg1, msg.arg2);
             } else if (msg.what == GameClient.ACTION_SET_SERVER_MOVE) {
                 setMoveForServer();
                 setTextViewMove();
             } else if (msg.what == GameClient.ACTION_SERVER_MOVE) {
                 int num = checkCellForClient(msg.arg1);
-                Toast.makeText(getApplicationContext(), "jjjjjjjj", Toast.LENGTH_SHORT).show();
-                setResultForServer(msg.arg1, num);
+                setResultForYour(msg.arg1, num);
                 GameClient gameClient = new GameClient(getApplicationContext(), 6, ""+ msg.arg1 + ":" + num, null);
                 new Thread(gameClient).start();
                 String answer = " ";
                 while (answer.startsWith(" ")) {
-                    Log.d("CLIENT", "inwhile");
                     answer = gameClient.getAnswer();
                 }
                 if (checkIfRuined(num)) {
@@ -477,7 +486,7 @@ public class GameActivity extends AppCompatActivity {
                 }
 
             } else if (msg.what == GameClient.ACTION_SEND_RESPONSE_TO_SERVER) {
-                setResultForClient(imageView, msg.arg2);
+                setResultForOpponent(imageView, msg.arg2);
             } else if (msg.what == GameClient.ACTION_SET_CLIENT_MOVE) {
                 isYourMove = false;
                 setTextViewMove();

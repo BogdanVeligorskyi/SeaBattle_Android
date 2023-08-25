@@ -14,14 +14,14 @@
         tools:ignore="UseSwitchCompatOrMaterialXml"
         android:layout_margin="25dp"
         android:textSize="18sp"
-        android:text="Dark mode">
+        android:text="@string/dark_mode">
     </Switch>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="25dp"
-        android:text="Your role:"
+        android:text="@string/your_role"
         android:textSize="18sp"
         android:layout_gravity="start"/>
 
@@ -37,14 +37,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:text="Host"/>
+            android:text="@string/host"/>
 
         <RadioButton
             android:id="@+id/guestButton_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:text="Guest"/>
+            android:text="@string/guest"/>
 
     </RadioGroup>
 
@@ -58,7 +58,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="Host IP"
+            android:text="@string/host_ip"
             android:textSize="18sp"
             android:layout_weight="2.0"
             android:textAlignment="center"/>
@@ -67,7 +67,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="Guest IP"
+            android:text="@string/guest_ip"
             android:textSize="18sp"
             android:layout_weight="2.0"
             android:textAlignment="center"/>
@@ -89,7 +89,9 @@
             android:textSize="18sp"
             android:layout_weight="2.0"
             android:textAlignment="center"
-            android:inputType="number"/>
+            android:inputType="number"
+            android:autofillHints=""
+            tools:ignore="LabelFor" />
 
         <EditText
             android:id="@+id/guestIP_id"
@@ -100,7 +102,9 @@
             android:textSize="18sp"
             android:layout_weight="2.0"
             android:textAlignment="center"
-            android:inputType="number"/>
+            android:inputType="number"
+            android:autofillHints=""
+            tools:ignore="LabelFor" />
 
     </LinearLayout>
 
@@ -111,6 +115,6 @@
         android:minWidth="110dp"
         android:minHeight="60dp"
         android:layout_gravity="bottom|center_horizontal"
-        android:text="Save"/>
+        android:text="@string/save"/>
 
 </LinearLayout>

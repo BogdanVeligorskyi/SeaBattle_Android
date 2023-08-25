@@ -1,7 +1,6 @@
 package com.digitalartists.seabattle.view;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -16,10 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.digitalartists.seabattle.R;
-import com.digitalartists.seabattle.model.FileProcessing;
-import com.digitalartists.seabattle.model.Settings;
-
-import java.io.IOException;
 
 // Play Activity class
 public class PlayActivity extends AppCompatActivity {
@@ -44,13 +39,10 @@ public class PlayActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_play);
 
-        Context context = getApplicationContext();
-        Settings settings;
-
-        onePartShipsNum = 1;
-        twoPartShipsNum = 1;
-        threePartShipsNum = 1;
-        minesNum = 1;
+        onePartShipsNum = 4;
+        twoPartShipsNum = 3;
+        threePartShipsNum = 2;
+        minesNum = 4;
 
         clicksInARow = 0;
         selectedTypeOfObject = -1;
@@ -123,8 +115,9 @@ public class PlayActivity extends AppCompatActivity {
                 tableRow.setGravity(Gravity.CENTER);
                 for (int k = 0; k < 11; k++) {
                     TextView textView = new TextView(this);
-                    textView.setLayoutParams((new TableRow.LayoutParams(30,
-                            30)));
+                    textView.setLayoutParams((new TableRow.LayoutParams(60,
+                            60)));
+                    textView.setPadding(5, 5, 5, 5);
                     if (k == 0) {
                       textView.setText(" ");
                     } else {
@@ -169,7 +162,7 @@ public class PlayActivity extends AppCompatActivity {
                         iView.setImageResource(R.drawable.mine_usual);
                         visited_arr[iView.getId()] = 10;
                         minesNum--;
-                        textViewMinesNum.setText(""+minesNum);
+                        textViewMinesNum.setText(String.format("%d", minesNum));
 
                         if (checkIfEnd()) {
                             buttonContinue.setEnabled(true);
@@ -183,7 +176,7 @@ public class PlayActivity extends AppCompatActivity {
                         visited_arr[iView.getId()] = 1;
                         onePartShipsNum--;
                         clicksInARow = 0;
-                        textViewOnePartShipsNum.setText(""+onePartShipsNum);
+                        textViewOnePartShipsNum.setText(String.format("%d", onePartShipsNum));
                         int id = iView.getId();
                         reserveNeighbourCells(id);
                         if (checkIfEnd()) {
@@ -221,7 +214,7 @@ public class PlayActivity extends AppCompatActivity {
                             }
 
                             twoPartShipsNum--;
-                            textViewTwoPartShipsNum.setText(""+ twoPartShipsNum);
+                            textViewTwoPartShipsNum.setText(String.format("%d", twoPartShipsNum));
                             if (checkIfEnd()) {
                                 buttonContinue.setEnabled(true);
                             }
@@ -269,7 +262,7 @@ public class PlayActivity extends AppCompatActivity {
                             }
 
                             threePartShipsNum--;
-                            textViewThreePartShipsNum.setText("" + threePartShipsNum);
+                            textViewThreePartShipsNum.setText(String.format("%d", threePartShipsNum));
                             if (checkIfEnd()) {
                                 buttonContinue.setEnabled(true);
                             }

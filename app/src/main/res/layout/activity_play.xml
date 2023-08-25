@@ -9,7 +9,7 @@
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp">
+        android:layout_margin="5dp">
 
         <TableRow
             android:weightSum="4.0"
@@ -123,9 +123,10 @@
         <Button
             android:id="@+id/continueButton_id"
             android:layout_width="140dp"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
+            android:layout_margin="2dp"
             android:text="Continue"/>
-    </LinearLayout>
 
+    </LinearLayout>
 
 </LinearLayout>

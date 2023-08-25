@@ -1,6 +1,5 @@
 package com.digitalartists.seabattle.model;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -14,16 +13,11 @@ import java.net.Socket;
 
 public class GameServer implements Runnable {
 
-    private Context context;
     private final Handler handler;
-
     public static String move;
-    private volatile String answer;
 
-    public GameServer(Context context, Handler handler) {
-        this.context = context;
+    public GameServer(Handler handler) {
         this.handler = handler;
-        this.answer = "";
         move = " ";
     }
 
@@ -42,7 +36,7 @@ public class GameServer implements Runnable {
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                 String str = in.readLine();
 
-                Log.d("SERVER", "afterreadline " + str);
+                Log.d("SERVER", "after read line " + str);
 
                 // in order to receive query from server-side GameActivity
                 while (str.startsWith(GameClient.SERVER_MOVE) && move.startsWith(" ")) {
@@ -64,7 +58,7 @@ public class GameServer implements Runnable {
                 if (str.startsWith(GameClient.CLIENT_MOVE)) {
                     Log.d("SERVER", "received cell from client");
                     String[] strNum = str.split(":");
-                    answer = String.valueOf(GameActivity.checkCellForServer(Integer.parseInt(strNum[1])));
+                    String answer = String.valueOf(GameActivity.checkCellForServer(Integer.parseInt(strNum[1])));
                     Message msg = handler.obtainMessage();
                     msg.what = GameClient.ACTION_CLIENT_MOVE_1;
                     msg.arg1 = Integer.parseInt(strNum[1]);
@@ -78,7 +72,7 @@ public class GameServer implements Runnable {
                 // set server move
                 if (str.startsWith(GameClient.SET_SERVER_MOVE)) {
                     Log.d("SERVER", "SET_SERVER_MOVE");
-                    answer = "Move set to SERVER";
+                    String answer = "Move set to SERVER";
                     Message msg = handler.obtainMessage();
                     msg.what = GameClient.ACTION_SET_SERVER_MOVE;
                     handler.sendMessage(msg);
@@ -132,9 +126,5 @@ public class GameServer implements Runnable {
             e.printStackTrace();
         }
     }
-
-    public String getAnswer() {
-        return answer;
-    };
 
 }

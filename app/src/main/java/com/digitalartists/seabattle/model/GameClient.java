@@ -30,7 +30,7 @@ public class GameClient implements Runnable {
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
-    private Context context;
+    private final Context context;
     private final String message;
 
     private volatile String answer;
@@ -84,7 +84,12 @@ public class GameClient implements Runnable {
                 startConnection();
                 String res = sendMessage("CHECK_CONNECTION:");
                 Log.d("CLIENT:", "CHECK_CONNECTION");
-                stopConnection();
+                if (res != null) {
+                    Message msg = handler.obtainMessage();
+                    msg.what = ACTION_CHECK_CONNECTION;
+                    handler.sendMessage(msg);
+                    stopConnection();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

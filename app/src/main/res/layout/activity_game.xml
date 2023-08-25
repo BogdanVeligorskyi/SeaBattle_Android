@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 <LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <TextView
@@ -16,84 +13,90 @@
         android:layout_margin="5dp"
         android:layout_gravity="center"
         android:textSize="18sp"
-        android:textColor="@color/orange"
-        android:text="Your move"/>
+        android:textColor="@color/green"
+        android:text="@string/move"/>
 
-    <LinearLayout
-        android:layout_height="match_parent"
+    <ScrollView
         android:layout_width="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/yourBoard_id"
-            android:layout_width="wrap_content"
+        <LinearLayout
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="Your board (Ruins left: 16)"/>
-
-        <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:fillViewport="true">
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <ScrollView
+            <TextView
+                android:id="@+id/yourBoard_id"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@color/green"
+                android:text="@string/your_board_ruins_left"/>
 
-                <TableLayout
-                    android:id="@+id/yourButtonsPanel_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center">
-                </TableLayout>
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:fillViewport="true">
 
-            </ScrollView>
+                <ScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-        </HorizontalScrollView>
+                    <TableLayout
+                        android:id="@+id/yourButtonsPanel_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center">
+                    </TableLayout>
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+                </ScrollView>
 
-        <TextView
-            android:id="@+id/opponentBoard_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="Opponent board (Ruins left: 16)"/>
+            </HorizontalScrollView>
 
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:fillViewport="true">
-
-            <ScrollView
+            <ProgressBar
+                android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"/>
 
-                <TableLayout
-                    android:id="@+id/opponentButtonsPanel_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center">
-                </TableLayout>
+            <TextView
+                android:id="@+id/opponentBoard_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@color/red"
+                android:text="@string/opponent_board_ruins_left"/>
 
-            </ScrollView>
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:fillViewport="true">
 
-        </HorizontalScrollView>
+                <ScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-    </LinearLayout>
+                    <TableLayout
+                        android:id="@+id/opponentButtonsPanel_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center">
+                    </TableLayout>
 
+                </ScrollView>
+
+            </HorizontalScrollView>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>
-</ScrollView>
