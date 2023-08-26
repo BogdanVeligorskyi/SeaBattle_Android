@@ -59,6 +59,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
+    // handler for 'Save' button
     private void handlerSaveButton() {
 
         isDarkModeOn = findViewById(R.id.switch_id);
@@ -86,6 +87,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
+    // start initialization
     private void startInit(Bundle savedInstanceState) {
         Context context = getApplicationContext();
         if (savedInstanceState != null) {
@@ -101,12 +103,13 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
+    // handler for radio buttons
     @SuppressLint("NonConstantResourceId")
     private void handlerRadioButtons() {
-        // 'Theme' radio group
+        // 'Role' radio group
         RadioGroup roleRadioGroup = findViewById(R.id.role_id);
         roleRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            // on theme change
+            // on role change
             switch (checkedId) {
                 case R.id.hostButton_id:
                     settings.setRole("HOST");
@@ -119,6 +122,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
+    // initialize settings fields
     private void initSettings() {
 
         RadioButton hostButtonRadioGroup = findViewById(R.id.hostButton_id);

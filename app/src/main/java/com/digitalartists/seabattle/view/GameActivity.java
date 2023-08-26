@@ -81,8 +81,6 @@ public class GameActivity extends AppCompatActivity {
             imageView.setImageResource(R.drawable.digit_3);
         } else if (type == 5 || type == 0) {
             imageView.setImageResource(R.drawable.non_clicked_cell);
-        } else if (type == 10) {
-            imageView.setImageResource(R.drawable.mine_usual);
         }
 
     }
@@ -111,15 +109,19 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
+    // refresh number of your ruins left
     @SuppressLint("DefaultLocale")
     private void setTextViewYourBoard() {
-        textViewYourBoard.setText(String.format("Your board (Ruins left: %d)", numOfYourRuinsLeft));
+        textViewYourBoard.setText(String.format("Your board (Ruins left: %d)",
+                numOfYourRuinsLeft));
     }
 
 
+    // refresh number of opponent ruins left
     @SuppressLint("DefaultLocale")
     private void setTextViewOpponentBoard() {
-        textViewOpponentBoard.setText(String.format("Opponent board (Ruins left: %d)", numOfOpponentRuinsLeft));
+        textViewOpponentBoard.setText(String.format("Opponent board (Ruins left: %d)",
+                numOfOpponentRuinsLeft));
     }
 
 
@@ -241,7 +243,8 @@ public class GameActivity extends AppCompatActivity {
 
                     // if attempted to click cell while it`s not user`s move
                     if (!isYourMove) {
-                        Toast.makeText(getApplicationContext(), "It`s not your move!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),
+                                "It`s not your move!", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -251,13 +254,15 @@ public class GameActivity extends AppCompatActivity {
 
                     // if you clicked already visited cell
                     if (visited_opponent_arr[id] != 0) {
-                        Toast.makeText(getApplicationContext(), "You`ve already clicked this cell!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),
+                                "You`ve already clicked this cell!", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     // send value to server
                     if (!settings.getRole().startsWith("HOST")) {
-                        GameClient gc = new GameClient(getApplicationContext(), 2, String.valueOf(id), null);
+                        GameClient gc = new GameClient(getApplicationContext(),
+                                2, String.valueOf(id), null);
                         new Thread(gc).start();
                         Log.d("Answer is ", ""+gc.getAnswer());
                         String answer = " ";
@@ -269,13 +274,15 @@ public class GameActivity extends AppCompatActivity {
                         isYourMove = checkIfRuined(Integer.parseInt(answer));
                         setTextViewMove();
                         if (!isYourMove) {
-                            gc = new GameClient(getApplicationContext(), 4, "", null);
+                            gc = new GameClient(getApplicationContext(),
+                                    4, "", null);
                             new Thread (gc).start();
                             answer = " ";
                             while (answer.startsWith(" ")) {
                                 answer = gc.getAnswer();
                             }
-                            gc = new GameClient(getApplicationContext(), 5, "", handler);
+                            gc = new GameClient(getApplicationContext(),
+                                    5, "", handler);
                             new Thread (gc).start();
                         }
                     } else {
@@ -322,7 +329,8 @@ public class GameActivity extends AppCompatActivity {
 
     // start client
     private void runAsClient() {
-        new Thread(new GameClient(getApplicationContext(), 1, "", handler)).start();
+        new Thread(new GameClient(getApplicationContext(),
+                1, "", handler)).start();
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
         isYourMove = true;
@@ -345,19 +353,25 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
+    // set isYourMove from SERVER class
     public static void setMoveForServer() {
         isYourMove = true;
     }
 
+
+    // check cell for SERVER
     public static int checkCellForServer(int cellNum) {
         return visited_your_arr[cellNum];
     }
 
+
+    // check cell for CLIENT
     private int checkCellForClient(int cellNum) {
         return visited_your_arr[cellNum];
     }
 
 
+    // check if you hit opponent ship
     private boolean checkIfRuined(int result) {
         return result == 1 || result == 2 || result == 3;
     }
@@ -381,8 +395,6 @@ public class GameActivity extends AppCompatActivity {
             numOfOpponentRuinsLeft--;
         } else if (result == 5 || result == 0) {
             imageView.setImageResource(R.drawable.non_clicked_cell_ruin);
-        } else if (result == 10) {
-            imageView.setImageResource(R.drawable.mine_clicked);
         }
         int id = imageView.getId();
         visited_opponent_arr[id - 100] = 1;
@@ -407,6 +419,7 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+
     // set result for user board after opponent move
     public void setResultForYour(int cellNum, int result) {
         ImageView imageView = imageViewList.get(cellNum);
@@ -426,8 +439,6 @@ public class GameActivity extends AppCompatActivity {
             numOfYourRuinsLeft--;
         } else if (result == 5 || result == 0) {
             imageView.setImageResource(R.drawable.non_clicked_cell_ruin);
-        } else if (result == 10) {
-            imageView.setImageResource(R.drawable.mine_clicked);
         }
 
         setTextViewYourBoard();

@@ -26,7 +26,6 @@ public class PlayActivity extends AppCompatActivity {
     private int onePartShipsNum;
     private int twoPartShipsNum;
     private int threePartShipsNum;
-    private int minesNum;
 
     private int clicksInARow;
 
@@ -42,7 +41,6 @@ public class PlayActivity extends AppCompatActivity {
         onePartShipsNum = 4;
         twoPartShipsNum = 3;
         threePartShipsNum = 2;
-        minesNum = 4;
 
         clicksInARow = 0;
         selectedTypeOfObject = -1;
@@ -50,12 +48,10 @@ public class PlayActivity extends AppCompatActivity {
         TextView textViewOnePartShipsNum = findViewById(R.id.numberOfOnePartShips_id);
         TextView textViewTwoPartShipsNum = findViewById(R.id.numberOfTwoPartShips_id);
         TextView textViewThreePartShipsNum = findViewById(R.id.numberOfThreePartShips_id);
-        TextView textViewMinesNum = findViewById(R.id.numberOfMines_id);
 
         ImageButton buttonOnePartShips = findViewById(R.id.onePartShips_id);
         ImageButton buttonTwoPartShips = findViewById(R.id.twoPartShips_id);
         ImageButton buttonThreePartShips = findViewById(R.id.threePartShips_id);
-        ImageButton buttonMines = findViewById(R.id.mines_id);
 
         Button buttonContinue = findViewById(R.id.continueButton_id);
         buttonContinue.setEnabled(false);
@@ -64,7 +60,6 @@ public class PlayActivity extends AppCompatActivity {
             butOnePartShips.setBackgroundColor(getResources().getColor(R.color.orange));
             buttonTwoPartShips.setBackgroundColor(getResources().getColor(R.color.purple_500));
             buttonThreePartShips.setBackgroundColor(getResources().getColor(R.color.purple_500));
-            buttonMines.setBackgroundColor(getResources().getColor(R.color.purple_500));
             selectedTypeOfObject = 1;
         });
 
@@ -72,7 +67,6 @@ public class PlayActivity extends AppCompatActivity {
             buttonOnePartShips.setBackgroundColor(getResources().getColor(R.color.purple_500));
             butTwoPartShips.setBackgroundColor(getResources().getColor(R.color.orange));
             buttonThreePartShips.setBackgroundColor(getResources().getColor(R.color.purple_500));
-            buttonMines.setBackgroundColor(getResources().getColor(R.color.purple_500));
             selectedTypeOfObject = 2;
         });
 
@@ -80,16 +74,7 @@ public class PlayActivity extends AppCompatActivity {
             buttonOnePartShips.setBackgroundColor(getResources().getColor(R.color.purple_500));
             buttonTwoPartShips.setBackgroundColor(getResources().getColor(R.color.purple_500));
             butThreePartShips.setBackgroundColor(getResources().getColor(R.color.orange));
-            buttonMines.setBackgroundColor(getResources().getColor(R.color.purple_500));
             selectedTypeOfObject = 3;
-        });
-
-        findViewById(R.id.mines_id).setOnClickListener(butMines -> {
-            buttonOnePartShips.setBackgroundColor(getResources().getColor(R.color.purple_500));
-            buttonTwoPartShips.setBackgroundColor(getResources().getColor(R.color.purple_500));
-            buttonThreePartShips.setBackgroundColor(getResources().getColor(R.color.purple_500));
-            butMines.setBackgroundColor(getResources().getColor(R.color.orange));
-            selectedTypeOfObject = 0;
         });
 
         findViewById(R.id.continueButton_id).setOnClickListener(butContinue -> {
@@ -110,7 +95,8 @@ public class PlayActivity extends AppCompatActivity {
             if (i == 0) {
                 tableLayout = findViewById(R.id.buttonsPanel_id);
                 TableRow tableRow = new TableRow(this);
-                tableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                tableRow.setLayoutParams(new TableRow.LayoutParams(
+                        TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT));
                 tableRow.setGravity(Gravity.CENTER);
                 for (int k = 0; k < 11; k++) {
@@ -133,20 +119,23 @@ public class PlayActivity extends AppCompatActivity {
             }
             tableLayout = findViewById(R.id.buttonsPanel_id);
             TableRow tableRow = new TableRow(this);
-            tableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+            tableRow.setLayoutParams(new TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT,
                     TableRow.LayoutParams.WRAP_CONTENT));
             tableRow.setGravity(Gravity.CENTER);
             for (int j = 0; j < 11; j++) {
                 if (j == 0) {
                     TextView textView = new TextView(this);
-                    textView.setLayoutParams((new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                    textView.setLayoutParams((new TableRow.LayoutParams(
+                            TableRow.LayoutParams.WRAP_CONTENT,
                             TableRow.LayoutParams.WRAP_CONTENT)));
                     textView.setText(letters[i-1]);
                     tableRow.addView(textView);
                     continue;
                 }
                 imageButton = new ImageView(this);
-                imageButton.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                imageButton.setLayoutParams(new TableRow.LayoutParams(
+                        TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT));
                 imageButton.setId((i-1) * 10 + (j-1));
                 visited_arr[(i-1) * 10 + (j-1)] = 0;
@@ -157,21 +146,9 @@ public class PlayActivity extends AppCompatActivity {
                 imageButton.setOnClickListener(v -> {
                     ImageView iView = (ImageView) v;
 
-                    // if mine was selected to place
-                    if (selectedTypeOfObject == 0 && visited_arr[iView.getId()] == 0 && minesNum > 0) {
-                        iView.setImageResource(R.drawable.mine_usual);
-                        visited_arr[iView.getId()] = 10;
-                        minesNum--;
-                        textViewMinesNum.setText(String.format("%d", minesNum));
-
-                        if (checkIfEnd()) {
-                            buttonContinue.setEnabled(true);
-                        }
-                        return;
-                    }
-
                     // if one-part ship was selected to place
-                    if (selectedTypeOfObject == 1 && visited_arr[iView.getId()] == 0 && onePartShipsNum > 0) {
+                    if (selectedTypeOfObject == 1 && visited_arr[iView.getId()] == 0
+                            && onePartShipsNum > 0) {
                         setIconToButton(iView, 1);
                         visited_arr[iView.getId()] = 1;
                         onePartShipsNum--;
@@ -185,10 +162,10 @@ public class PlayActivity extends AppCompatActivity {
                     }
 
                     // if two-part ship was selected to place
-                    if (selectedTypeOfObject == 2 && visited_arr[iView.getId()] == 0 && twoPartShipsNum > 0) {
+                    if (selectedTypeOfObject == 2 && visited_arr[iView.getId()] == 0
+                            && twoPartShipsNum > 0) {
                         if (clicksInARow <= 0) {
                             clicked_cells_arr = new int[2];
-                            buttonMines.setEnabled(false);
                             buttonOnePartShips.setEnabled(false);
                             buttonThreePartShips.setEnabled(false);
                             clicked_cells_arr[0] = iView.getId();
@@ -200,12 +177,12 @@ public class PlayActivity extends AppCompatActivity {
                                 clicksInARow = 0;
                                 clicked_cells_arr[1] = iView.getId();
                                 visited_arr[iView.getId()] = 2;
-                                buttonMines.setEnabled(true);
                                 buttonOnePartShips.setEnabled(true);
                                 buttonThreePartShips.setEnabled(true);
                                 setIconToButton(iView, 2);
                             } else {
-                                Toast.makeText(this, "Incorrect cell!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this,
+                                        "Incorrect cell!", Toast.LENGTH_SHORT).show();
                                 return;
                             }
 
@@ -224,10 +201,10 @@ public class PlayActivity extends AppCompatActivity {
                     }
 
                     // if three-part ship was selected to place
-                    if (selectedTypeOfObject == 3 && visited_arr[iView.getId()] == 0 && threePartShipsNum > 0) {
+                    if (selectedTypeOfObject == 3 && visited_arr[iView.getId()] == 0
+                            && threePartShipsNum > 0) {
                         if (clicksInARow <= 0) {
                             clicked_cells_arr = new int[3];
-                            buttonMines.setEnabled(false);
                             buttonOnePartShips.setEnabled(false);
                             buttonTwoPartShips.setEnabled(false);
                             clicked_cells_arr[0] = iView.getId();
@@ -241,19 +218,20 @@ public class PlayActivity extends AppCompatActivity {
                                 clicksInARow++;
                                 setIconToButton(iView, 3);
                             } else {
-                                Toast.makeText(this, "Incorrect cell!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this,
+                                        "Incorrect cell!", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             if (checkIfIsPartOfShip(clicked_cells_arr, iView.getId())) {
                                 clicksInARow = 0;
                                 clicked_cells_arr[2] = iView.getId();
                                 visited_arr[iView.getId()] = 3;
-                                buttonMines.setEnabled(true);
                                 buttonOnePartShips.setEnabled(true);
                                 buttonTwoPartShips.setEnabled(true);
                                 setIconToButton(iView, 3);
                             } else {
-                                Toast.makeText(this, "Incorrect cell!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this,
+                                        "Incorrect cell!", Toast.LENGTH_SHORT).show();
                                 return;
                             }
 
@@ -262,7 +240,8 @@ public class PlayActivity extends AppCompatActivity {
                             }
 
                             threePartShipsNum--;
-                            textViewThreePartShipsNum.setText(String.format("%d", threePartShipsNum));
+                            textViewThreePartShipsNum.setText(
+                                    String.format("%d", threePartShipsNum));
                             if (checkIfEnd()) {
                                 buttonContinue.setEnabled(true);
                             }
@@ -281,6 +260,7 @@ public class PlayActivity extends AppCompatActivity {
 
     }
 
+
     // check if coordinates of button are valid
     boolean checkIfValidCoord(int firstParam, int num) {
 
@@ -294,6 +274,8 @@ public class PlayActivity extends AppCompatActivity {
                 (x != 0 || x_prev != (10 - 1)) && (x != (10 - 1) || x_prev != 0);
     }
 
+
+    // check if last clicked cell may be a part of ship
     boolean checkIfIsPartOfShip(int[] clicked_cells_arr, int last) {
         for(int i = 0; i < clicked_cells_arr.length-1; i++) {
             int x_prev = clicked_cells_arr[i] / 10;
@@ -302,8 +284,9 @@ public class PlayActivity extends AppCompatActivity {
             int x_last = last / 10;
             int y_last = last % 10;
 
-            if ((((x_last - 1) == x_prev) && (y_last == y_prev)) || (((x_last + 1) == x_prev) && (y_last == y_prev))
-                    || (((y_last - 1) == y_prev) && (x_last == x_prev)) || (((y_last + 1) == y_prev) && (x_last == x_prev))) {
+            if ((((x_last - 1) == x_prev) && (y_last == y_prev)) || (((x_last + 1) == x_prev)
+                    && (y_last == y_prev)) || (((y_last - 1) == y_prev)
+                    && (x_last == x_prev)) || (((y_last + 1) == y_prev) && (x_last == x_prev))) {
                 return true;
             }
         }
@@ -327,16 +310,20 @@ public class PlayActivity extends AppCompatActivity {
             imageView.setImageResource(R.drawable.digit_3);
         } else if (type == 5) {
             imageView.setImageResource(R.drawable.non_clicked_cell);
-        } else if (type == 10) {
-            imageView.setImageResource(R.drawable.mine_usual);
         }
 
     }
 
+
+    // check if all ships were placed
     boolean checkIfEnd() {
-        return minesNum == 0 && onePartShipsNum == 0 && twoPartShipsNum == 0 && threePartShipsNum == 0;
+        return onePartShipsNum == 0
+                && twoPartShipsNum == 0
+                && threePartShipsNum == 0;
     }
 
+
+    // mark neighbour cells in order to prevent other ship placement
     void reserveNeighbourCells(int id) {
         if (checkIfValidCoord(id, id - 1) && visited_arr[id - 1] == 0) {
             ImageView imageView = findViewById(id - 1);

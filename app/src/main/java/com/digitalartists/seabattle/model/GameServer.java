@@ -58,7 +58,8 @@ public class GameServer implements Runnable {
                 if (str.startsWith(GameClient.CLIENT_MOVE)) {
                     Log.d("SERVER", "received cell from client");
                     String[] strNum = str.split(":");
-                    String answer = String.valueOf(GameActivity.checkCellForServer(Integer.parseInt(strNum[1])));
+                    String answer = String.valueOf(
+                            GameActivity.checkCellForServer(Integer.parseInt(strNum[1])));
                     Message msg = handler.obtainMessage();
                     msg.what = GameClient.ACTION_CLIENT_MOVE_1;
                     msg.arg1 = Integer.parseInt(strNum[1]);
@@ -110,6 +111,7 @@ public class GameServer implements Runnable {
 
                 }
 
+                // set client move
                 if (str.startsWith(GameClient.SET_CLIENT_MOVE)) {
                     Log.d("SERVER", "SET_CLIENT_MOVE");
                     Message msg = handler.obtainMessage();
