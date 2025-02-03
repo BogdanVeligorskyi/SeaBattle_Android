@@ -1,9 +1,10 @@
 # Sea Battle (Android)
 
-![alt text](https://github.com/BogdanVeligorskyi/SeaBattle_Android/blob/main/screen_1.png?raw=true)
-![alt text](https://github.com/BogdanVeligorskyi/SeaBattle_Android/blob/main/screen_2.png?raw=true)
-![alt text](https://github.com/BogdanVeligorskyi/SeaBattle_Android/blob/main/screen_3.png?raw=true)
-![alt text](https://github.com/BogdanVeligorskyi/SeaBattle_Android/blob/main/screen_4.png?raw=true)
+![alt text](https://github.com/BogdanVeligorskyi/SeaBattle_Android/blob/main/screens/screen_1.png?raw=true)
+![alt text](https://github.com/BogdanVeligorskyi/SeaBattle_Android/blob/main/screens/screen_2.png?raw=true)
+![alt text](https://github.com/BogdanVeligorskyi/SeaBattle_Android/blob/main/screens/screen_3.png?raw=true)
+![alt text](https://github.com/BogdanVeligorskyi/SeaBattle_Android/blob/main/screens/screen_4.png?raw=true)
+![alt text](https://github.com/BogdanVeligorskyi/SeaBattle_Android/blob/main/screens/screen_5.png?raw=true)
 
 My implementation of iconic Sea Battle game for Android devices.
 
